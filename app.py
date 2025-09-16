@@ -2,23 +2,47 @@ import streamlit as st
 import requests
 import os
 import plotly.graph_objects as go
-from transformers import pipeline
-from sentence_transformers import SentenceTransformer, util
-import sys  # Added for debug
+import sys  # For debug
+
+# -----------------------------
+# Set cache folder for transformers to avoid using repo space
+# -----------------------------
 os.environ['TRANSFORMERS_CACHE'] = '/tmp/transformers_cache'
+
 # 🔍 Debug: Show Python interpreter path used to run Streamlit
 st.write(f"Running with Python interpreter: {sys.executable}")
+
+# -----------------------------
+# Load API key from Streamlit Secrets
+# -----------------------------
 API_KEY = st.secrets["API_KEY"]
 
-# Load models
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+# -----------------------------
+# Load models (optimized for Streamlit Cloud)
+# -----------------------------
+from transformers import pipeline
+from sentence_transformers import SentenceTransformer, util
+
+# Smaller summarization model (~250MB instead of 1.5GB)
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+
+# Lightweight question-answering model
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+
+# Sentence embeddings (small, ~120MB)
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
+# -----------------------------
 # Load climate corpus
+# -----------------------------
 with open("climate.txt", "r", encoding="utf-8") as f:
     climate_corpus = f.read().splitlines()
 corpus_embeddings = embedder.encode(climate_corpus, convert_to_tensor=True)
+
+# -----------------------------
+# Weather & Forecast Functions
+# -----------------------------
+BASE_URL = "http://api.openweathermap.org/data/2.5/"
 
 def get_weather(city):
     url = f"{BASE_URL}weather?q={city}&appid={API_KEY}&units=metric"
@@ -49,6 +73,9 @@ def ai_recommendation(condition):
     else:
         return "Stay safe and follow eco-friendly practices."
 
+# -----------------------------
+# AI Functions
+# -----------------------------
 def chatbot_response(query):
     query_embedding = embedder.encode(query, convert_to_tensor=True)
     scores = util.pytorch_cos_sim(query_embedding, corpus_embeddings)[0]
@@ -75,6 +102,9 @@ def plot_forecast_chart(forecast_data):
     )
     return fig
 
+# -----------------------------
+# Streamlit App
+# -----------------------------
 def main():
     st.set_page_config(page_title="AI Climate & Weather Dashboard", layout="wide")
     st.markdown(
@@ -117,3 +147,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
