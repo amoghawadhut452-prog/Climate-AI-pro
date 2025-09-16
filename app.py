@@ -16,6 +16,9 @@ st.write(f"Running with Python interpreter: {sys.executable}")
 # Load API key from Streamlit Secrets
 # -----------------------------
 API_KEY = st.secrets["API_KEY"]
+# OpenWeatherMap API base URL
+BASE_URL = "http://api.openweathermap.org/data/2.5/"
+
 
 # -----------------------------
 # Load models (optimized for Streamlit Cloud)
