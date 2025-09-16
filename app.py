@@ -5,39 +5,44 @@ import plotly.graph_objects as go
 import sys  # For debug
 
 # -----------------------------
-# Set cache folder for transformers to avoid using repo space
+# Set Hugging Face cache folder (Streamlit Cloud friendly)
 # -----------------------------
-os.environ['TRANSFORMERS_CACHE'] = '/tmp/transformers_cache'
+os.environ['HF_HOME'] = '/tmp/huggingface_cache'
 
-# 🔍 Debug: Show Python interpreter path used to run Streamlit
+# Optional: prevent repeated downloads
+os.environ["TRANSFORMERS_OFFLINE"] = "0"
+
+# Debug: show Python interpreter path
 st.write(f"Running with Python interpreter: {sys.executable}")
 
 # -----------------------------
 # Load API key from Streamlit Secrets
 # -----------------------------
 API_KEY = st.secrets["API_KEY"]
-# OpenWeatherMap API base URL
 BASE_URL = "http://api.openweathermap.org/data/2.5/"
 
-
 # -----------------------------
-# Load models (optimized for Streamlit Cloud)
+# Load models (small / cloud optimized)
 # -----------------------------
 from transformers import pipeline
 from sentence_transformers import SentenceTransformer, util
 
-# Smaller summarization model (~250MB instead of 1.5GB)
+# Summarization model (~250MB)
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
-# Lightweight question-answering model
+# Question-answering model
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
-# Sentence embeddings (small, ~120MB)
+# Sentence embeddings
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
 # -----------------------------
 # Load climate corpus
 # -----------------------------
+if not os.path.exists("climate.txt"):
+    st.error("climate.txt not found! Please add it to the repo root.")
+    st.stop()
+
 with open("climate.txt", "r", encoding="utf-8") as f:
     climate_corpus = f.read().splitlines()
 corpus_embeddings = embedder.encode(climate_corpus, convert_to_tensor=True)
@@ -45,8 +50,6 @@ corpus_embeddings = embedder.encode(climate_corpus, convert_to_tensor=True)
 # -----------------------------
 # Weather & Forecast Functions
 # -----------------------------
-BASE_URL = "http://api.openweathermap.org/data/2.5/"
-
 def get_weather(city):
     url = f"{BASE_URL}weather?q={city}&appid={API_KEY}&units=metric"
     response = requests.get(url)
@@ -150,4 +153,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
