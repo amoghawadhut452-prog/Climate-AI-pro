@@ -7,9 +7,7 @@ import sys  # Added for debug
 
 # 🔍 Debug: Show Python interpreter path used to run Streamlit
 st.write(f"Running with Python interpreter: {sys.executable}")
-
-API_KEY = "fe141fd3058ed253c214f5dff7fe69a5"
-BASE_URL = "http://api.openweathermap.org/data/2.5/"
+API_KEY = st.secrets["API_KEY"]
 
 # Load models
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
