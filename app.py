@@ -1,10 +1,11 @@
 import streamlit as st
 import requests
+import os
 import plotly.graph_objects as go
 from transformers import pipeline
 from sentence_transformers import SentenceTransformer, util
 import sys  # Added for debug
-
+os.environ['TRANSFORMERS_CACHE'] = '/tmp/transformers_cache'
 # 🔍 Debug: Show Python interpreter path used to run Streamlit
 st.write(f"Running with Python interpreter: {sys.executable}")
 API_KEY = st.secrets["API_KEY"]
