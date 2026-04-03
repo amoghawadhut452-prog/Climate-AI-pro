@@ -7,8 +7,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 API_KEY = "Your_API_Key"
-BASE_URL = "Your_API_Key"
-FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
+BASE_URL = "Your_API_Key URL"
+FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast" #the one i used here 
 
 def get_weather(city:str):
     try:
