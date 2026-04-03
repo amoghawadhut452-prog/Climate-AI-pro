@@ -6,7 +6,7 @@ from datetime import datetime
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-API_KEY = "fe141fd3058ed253c214f5dff7fe69a5"
+API_KEY = "Your_API_Key"
 BASE_URL = "Your_API_Key"
 FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
